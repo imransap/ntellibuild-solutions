@@ -1,13 +1,32 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Navbar } from "@/components/Navbar";
+import { HeroSection } from "@/components/HeroSection";
+import { HowItWorks } from "@/components/HowItWorks";
+import { ServicesSection } from "@/components/ServicesSection";
+import { WorkflowBuilder } from "@/components/WorkflowBuilder";
+import { Testimonials } from "@/components/Testimonials";
+import { CaseStudies } from "@/components/CaseStudies";
+import { TechStack } from "@/components/TechStack";
+import { FAQSection } from "@/components/FAQSection";
+import { ContactSection } from "@/components/ContactSection";
+import { ChatBot } from "@/components/ChatBot";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <main className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+      <TechStack />
+      <HowItWorks />
+      <ServicesSection />
+      <WorkflowBuilder />
+      <Testimonials />
+      <CaseStudies />
+      <FAQSection />
+      <ContactSection />
+      <Footer />
+      <ChatBot />
+    </main>
   );
 };
 
