@@ -86,25 +86,24 @@ export const HeroSection = () => {
               </Button>
             </div>
 
-            {/* Stats */}
+            {/* Video Placeholder */}
             <div
-              className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto animate-fade-in"
+              className="mt-16 max-w-4xl mx-auto animate-fade-in"
               style={{ animationDelay: "0.4s" }}
             >
-              {[
-                { value: "500+", label: "Workflows Automated" },
-                { value: "98%", label: "Time Saved" },
-                { value: "3x", label: "Lead Generation" },
-              ].map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="font-display text-3xl md:text-4xl font-bold text-gradient-accent">
-                    {stat.value}
+              <div className="relative aspect-video rounded-2xl overflow-hidden glass border border-border/50">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/30">
+                  <div className="w-20 h-20 rounded-full bg-crimson/20 flex items-center justify-center mb-4 cursor-pointer hover:bg-crimson/30 transition-colors group">
+                    <Play className="w-8 h-8 text-crimson group-hover:scale-110 transition-transform" />
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {stat.label}
-                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Discover SmartRunAI
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    See how we transform businesses with intelligent automation
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
