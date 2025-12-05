@@ -51,7 +51,7 @@ export const HeroSection = () => {
               className="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in"
               style={{ animationDelay: "0.1s" }}
             >
-              <span className="text-gradient">Automate Your Business</span>
+              <span className="text-gradient">Automate Your Business Workflow</span>
               <br />
               <span className="text-foreground">with</span>{" "}
               <span className="text-gradient-accent glow-text">Intelligent AI</span>
