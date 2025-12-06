@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Calendar, Loader2 } from "lucide-react";
@@ -43,6 +44,14 @@ const sources = [
   "Other",
 ];
 
+const companySize = [
+  "1-10 employees",
+  "11-50 employees",
+  "51-200 employees",
+  "201-500 employees",
+  "500+ employees",
+];
+
 export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,9 +59,12 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
     lastName: "",
     email: "",
     phone: "",
+    companyName: "",
+    companySize: "",
     industry: "",
     budget: "",
     source: "",
+    projectDescription: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,9 +83,12 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
       lastName: "",
       email: "",
       phone: "",
+      companyName: "",
+      companySize: "",
       industry: "",
       budget: "",
       source: "",
+      projectDescription: "",
     });
     setIsSubmitting(false);
     onOpenChange(false);
@@ -145,6 +160,38 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Company Name *</Label>
+              <Input
+                id="companyName"
+                required
+                value={formData.companyName}
+                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                placeholder="Your Company"
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="companySize">Company Size</Label>
+              <Select
+                value={formData.companySize}
+                onValueChange={(value) => setFormData({ ...formData, companySize: value })}
+              >
+                <SelectTrigger className="bg-secondary/50 border-border/50">
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent className="glass-card border-border/50">
+                  {companySize.map((size) => (
+                    <SelectItem key={size} value={size}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="industry">Industry *</Label>
             <Select
@@ -201,6 +248,18 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="projectDescription">Tell us about your project *</Label>
+            <Textarea
+              id="projectDescription"
+              required
+              value={formData.projectDescription}
+              onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
+              placeholder="Describe what processes you'd like to automate and any specific challenges you're facing..."
+              className="bg-secondary/50 border-border/50 min-h-[100px]"
+            />
           </div>
 
           <Button type="submit" variant="hero" className="w-full" disabled={isSubmitting}>
