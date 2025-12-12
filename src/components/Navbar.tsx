@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { BookDemoModal } from "./BookDemoModal";
-import logo from "@/assets/SmartRunAI_logo.png";
+import logo from "@/assets/SmartRunAI_logo_transparent.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -38,7 +38,7 @@ export const Navbar = () => {
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
-            <img src={logo} alt="Smart Run AI" className="h-10 w-auto" />
+            <img src={logo} alt="Smart Run AI" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
