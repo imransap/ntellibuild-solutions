@@ -1,5 +1,5 @@
 import { Linkedin, Twitter, Github, Mail } from "lucide-react";
-import logo from "@/assets/SmartRunAI_logo_transparent.png";
+import logo from "@/assets/SmartRunAI_logo.png";
 
 const footerLinks = {
   company: [
