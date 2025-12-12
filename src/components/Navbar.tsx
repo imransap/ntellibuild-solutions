@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { BookDemoModal } from "./BookDemoModal";
+import logo from "@/assets/SmartRunAI_logo.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -36,13 +37,8 @@ export const Navbar = () => {
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-crimson to-crimson-dark flex items-center justify-center glow">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-display font-bold text-xl text-foreground group-hover:text-gradient-accent transition-colors">
-              SmartRunAI
-            </span>
+          <Link to="/" className="flex items-center group">
+            <img src={logo} alt="Smart Run AI" className="h-10 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
