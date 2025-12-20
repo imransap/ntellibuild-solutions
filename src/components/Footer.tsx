@@ -1,5 +1,4 @@
 import { Linkedin, Twitter, Github, Mail } from "lucide-react";
-import logo from "@/assets/SmartRunAI_logo_transparent.png";
 
 const footerLinks = {
   company: [
@@ -43,7 +42,7 @@ export const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <a href="/" className="flex items-center mb-4">
-              <img src={logo} alt="Smart Run AI" className="h-12 w-auto" />
+              <span className="font-display text-xl font-bold text-foreground">SmartRunAI</span>
             </a>
             <p className="text-muted-foreground text-sm mb-6 max-w-xs">
               Empowering businesses with intelligent automation solutions. Transform your workflows, amplify your impact.
