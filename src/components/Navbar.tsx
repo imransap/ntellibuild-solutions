@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { BookDemoModal } from "./BookDemoModal";
-import logo from "@/assets/SmartRunAI_logo.png";
+import logo from "@/assets/SmartRunAI_logo_transparent.png";
 
 const navLinks = [
   { name: "Home", href: "/" },
