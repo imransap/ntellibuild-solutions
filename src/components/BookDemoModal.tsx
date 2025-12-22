@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Calendar, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BookDemoModalProps {
   open: boolean;
@@ -71,27 +72,50 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: {
+          formType: "demo",
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          companyName: formData.companyName,
+          companySize: formData.companySize,
+          industry: formData.industry,
+          budget: formData.budget,
+          source: formData.source,
+          projectDescription: formData.projectDescription,
+        },
+      });
 
-    toast.success("Demo request submitted!", {
-      description: "Our team will contact you within 24 hours.",
-    });
+      if (error) throw error;
 
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      companyName: "",
-      companySize: "",
-      industry: "",
-      budget: "",
-      source: "",
-      projectDescription: "",
-    });
-    setIsSubmitting(false);
-    onOpenChange(false);
+      toast.success("Demo request submitted!", {
+        description: "Our team will contact you within 24 hours.",
+      });
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        companyName: "",
+        companySize: "",
+        industry: "",
+        budget: "",
+        source: "",
+        projectDescription: "",
+      });
+      onOpenChange(false);
+    } catch (error: any) {
+      console.error("Error sending demo request:", error);
+      toast.error("Failed to submit demo request", {
+        description: "Please try again or contact us directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -149,10 +173,11 @@ export const BookDemoModal = ({ open, onOpenChange }: BookDemoModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">Phone *</Label>
             <Input
               id="phone"
               type="tel"
+              required
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               placeholder="+1 (555) 000-0000"
