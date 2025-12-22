@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Mail, Phone, MapPin, Loader2, Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const industries = [
   "Healthcare",
@@ -55,23 +56,45 @@ export const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: {
+          formType: "contact",
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          industry: formData.industry,
+          budget: formData.budget,
+          source: formData.source,
+          message: formData.message,
+        },
+      });
 
-    toast.success("Message sent successfully!", {
-      description: "We'll get back to you within 24 hours.",
-    });
+      if (error) throw error;
 
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      industry: "",
-      budget: "",
-      source: "",
-      message: "",
-    });
-    setIsSubmitting(false);
+      toast.success("Message sent successfully!", {
+        description: "We'll get back to you within 24 hours.",
+      });
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        industry: "",
+        budget: "",
+        source: "",
+        message: "",
+      });
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message", {
+        description: "Please try again or contact us directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -102,7 +125,7 @@ export const ContactSection = () => {
                 <div>
                   <h3 className="font-display font-semibold text-foreground">Email</h3>
                   <p className="text-muted-foreground text-sm mt-1">
-                    hello@smartrunai.com
+                    info@smartrunai.com
                   </p>
                 </div>
               </div>
@@ -180,10 +203,11 @@ export const ContactSection = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">Phone *</Label>
                   <Input
                     id="phone"
                     type="tel"
+                    required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+1 (555) 000-0000"
