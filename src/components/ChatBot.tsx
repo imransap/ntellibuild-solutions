@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BookDemoModal } from "./BookDemoModal";
 
 interface Message {
   id: number;
@@ -27,6 +28,7 @@ export const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showBookDemo, setShowBookDemo] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -37,6 +39,27 @@ export const ChatBot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Render message text with clickable "Book a Demo" links
+  const renderMessageWithLinks = (text: string) => {
+    const bookDemoRegex = /(book a demo)/gi;
+    const parts = text.split(bookDemoRegex);
+    
+    return parts.map((part, index) => {
+      if (part.toLowerCase() === "book a demo") {
+        return (
+          <button
+            key={index}
+            onClick={() => setShowBookDemo(true)}
+            className="text-crimson underline hover:text-crimson-dark font-medium cursor-pointer"
+          >
+            {part}
+          </button>
+        );
+      }
+      return part;
+    });
+  };
 
   const streamChat = async (userMessages: { role: string; content: string }[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -226,7 +249,7 @@ export const ChatBot = () => {
                       : "bg-gradient-to-r from-crimson to-crimson-dark text-white rounded-br-md"
                   }`}
                 >
-                  {message.text}
+                  {message.isBot ? renderMessageWithLinks(message.text) : message.text}
                 </div>
               </div>
             ))}
@@ -270,6 +293,8 @@ export const ChatBot = () => {
           </div>
         </div>
       )}
+
+      <BookDemoModal open={showBookDemo} onOpenChange={setShowBookDemo} />
     </>
   );
 };
