@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: number;
@@ -13,44 +14,104 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: 1,
-    text: "Hi! 👋 I'm SmartRunAI Assistant. How can I help you today?",
+    text: "Hi! 👋 I'm SmartRunAI Assistant. I can help you learn about our automation services, answer questions, or guide you to book a demo. How can I help you today?",
     isBot: true,
     timestamp: new Date(),
   },
 ];
 
-const botResponses: Record<string, string> = {
-  pricing: "Our pricing varies based on project scope. Simple automations start at $5,000, while enterprise solutions range from $50,000+. Would you like to schedule a call to discuss your specific needs?",
-  demo: "I'd be happy to help you schedule a demo! Click the 'Book a Demo' button in the navigation, or I can guide you through the process. What time works best for you?",
-  services: "We offer workflow automation, email automation, lead generation, analytics & reporting, customer support AI, and more. Which service interests you most?",
-  timeline: "Implementation typically takes 1-8 weeks depending on complexity. Simple automations can be live within a week, while enterprise solutions take 4-8 weeks.",
-  default: "Thanks for your message! For detailed inquiries, I recommend speaking with our team. Would you like to schedule a consultation or ask about a specific service?",
-};
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot`;
 
 export const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  const getBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    if (lowerMessage.includes("price") || lowerMessage.includes("cost") || lowerMessage.includes("budget")) {
-      return botResponses.pricing;
-    }
-    if (lowerMessage.includes("demo") || lowerMessage.includes("trial")) {
-      return botResponses.demo;
-    }
-    if (lowerMessage.includes("service") || lowerMessage.includes("offer") || lowerMessage.includes("what do you")) {
-      return botResponses.services;
-    }
-    if (lowerMessage.includes("time") || lowerMessage.includes("long") || lowerMessage.includes("timeline")) {
-      return botResponses.timeline;
-    }
-    return botResponses.default;
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const streamChat = async (userMessages: { role: string; content: string }[]) => {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages: userMessages }),
+    });
+
+    if (!resp.ok) {
+      const errorData = await resp.json().catch(() => ({}));
+      throw new Error(errorData.error || `Request failed with status ${resp.status}`);
+    }
+
+    if (!resp.body) throw new Error("No response body");
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let textBuffer = "";
+    let assistantText = "";
+
+    const updateAssistantMessage = (text: string) => {
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.isBot && last.id === -1) {
+          return prev.map((m, i) => 
+            i === prev.length - 1 ? { ...m, text } : m
+          );
+        }
+        return [...prev, { id: -1, text, isBot: true, timestamp: new Date() }];
+      });
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      textBuffer += decoder.decode(value, { stream: true });
+
+      let newlineIndex: number;
+      while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+        let line = textBuffer.slice(0, newlineIndex);
+        textBuffer = textBuffer.slice(newlineIndex + 1);
+
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") break;
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) {
+            assistantText += content;
+            updateAssistantMessage(assistantText);
+          }
+        } catch {
+          textBuffer = line + "\n" + textBuffer;
+          break;
+        }
+      }
+    }
+
+    // Finalize the message with a proper ID
+    setMessages(prev => 
+      prev.map(m => m.id === -1 ? { ...m, id: Date.now() } : m)
+    );
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -59,19 +120,40 @@ export const ChatBot = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
+    setIsLoading(true);
 
-    // Simulate bot typing
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: Date.now() + 1,
-        text: getBotResponse(input),
+    try {
+      // Build conversation history for context
+      const conversationHistory = messages
+        .filter(m => m.id !== 1) // Exclude initial greeting
+        .map(m => ({
+          role: m.isBot ? "assistant" : "user",
+          content: m.text,
+        }));
+      
+      conversationHistory.push({ role: "user", content: userInput });
+
+      await streamChat(conversationHistory);
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast({
+        title: "Connection issue",
+        description: "Unable to get a response. Please try again.",
+        variant: "destructive",
+      });
+      // Add fallback message
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: "I'm having trouble connecting right now. Please try again in a moment, or feel free to contact us at info@smartrunai.com or book a demo directly!",
         isBot: true,
         timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -102,7 +184,7 @@ export const ChatBot = () => {
                   </div>
                   <div className="text-xs text-green-500 flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Online
+                    AI Assistant
                   </div>
                 </div>
               </div>
@@ -148,6 +230,17 @@ export const ChatBot = () => {
                 </div>
               </div>
             ))}
+            {isLoading && messages[messages.length - 1]?.isBot === false && (
+              <div className="flex items-end gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-crimson to-crimson-dark flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-white" />
+                </div>
+                <div className="bg-secondary text-foreground rounded-2xl rounded-bl-md p-3">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
@@ -162,11 +255,16 @@ export const ChatBot = () => {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
+                placeholder="Ask me anything..."
                 className="flex-1 bg-secondary/50 border-border/50"
+                disabled={isLoading}
               />
-              <Button type="submit" variant="hero" size="icon">
-                <Send className="w-4 h-4" />
+              <Button type="submit" variant="hero" size="icon" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </Button>
             </form>
           </div>
