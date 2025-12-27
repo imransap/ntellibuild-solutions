@@ -3,14 +3,30 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-// Allowed origins for CORS
+// Allowed origins for CORS - exact matches
 const ALLOWED_ORIGINS = [
   "https://smartrunai.com",
   "https://www.smartrunai.com",
+  "https://smartrunai.io",
+  "https://www.smartrunai.io",
   "https://smart-run-ai-website.lovable.app",
   "http://localhost:8080",
   "http://localhost:5173",
 ];
+
+// Pattern matching for dynamic Lovable domains
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  
+  // Check exact matches first
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  
+  // Allow any Lovable preview/deployed domains
+  if (origin.endsWith(".lovable.app")) return true;
+  if (origin.endsWith(".lovableproject.com")) return true;
+  
+  return false;
+}
 
 // Simple in-memory rate limiting (per IP, resets on function restart)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -18,7 +34,7 @@ const RATE_LIMIT_MAX = 5; // Max 5 requests per minute
 const RATE_LIMIT_WINDOW = 60000; // 1 minute in ms
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowedOrigin = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
