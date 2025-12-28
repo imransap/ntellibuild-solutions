@@ -10,13 +10,22 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
 ];
 
+// Check if origin matches allowed patterns (including lovableproject.com subdomains)
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  // Allow any lovableproject.com subdomain for preview
+  if (origin.endsWith('.lovableproject.com')) return true;
+  return false;
+}
+
 // Simple in-memory rate limiting (per IP, resets on function restart)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_MAX = 20; // Max 20 requests per minute for chatbot
 const RATE_LIMIT_WINDOW = 60000; // 1 minute in ms
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowedOrigin = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
