@@ -76,13 +76,16 @@ const About = () => {
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-video rounded-2xl bg-gradient-to-br from-crimson/20 to-navy/20 glass flex items-center justify-center overflow-hidden border border-border/30">
-                <div className="text-center">
-                  <div className="w-20 h-20 rounded-full bg-crimson/20 flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-crimson/30 transition-colors">
-                    <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-crimson border-b-[12px] border-b-transparent ml-1" />
-                  </div>
-                  <p className="text-muted-foreground text-sm">Video Coming Soon</p>
-                </div>
+              <div className="aspect-video rounded-2xl overflow-hidden border border-border/30 bg-background">
+                <video 
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                  poster="/videos/Smart_Run_AI_poster.jpg"
+                >
+                  <source src="/videos/Smart_Run_AI.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </div>

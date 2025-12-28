@@ -6,6 +6,9 @@ const technologies = [
   { icon: Database, name: "PostgreSQL", description: "Data management" },
   { icon: Lock, name: "SOC 2 Compliant", description: "Enterprise security" },
   { icon: Zap, name: "Zapier", description: "3000+ integrations" },
+  { icon: Zap, name: "n8n", description: "Workflow automation" },
+  { icon: Zap, name: "Make", description: "Visual automation" },
+  { icon: Globe, name: "Power BI", description: "Business intelligence" },
   { icon: Globe, name: "REST APIs", description: "Universal connectivity" },
 ];
 

@@ -27,7 +27,8 @@ const Solutions = () => {
       </section>
 
       <CaseStudies />
-      <Testimonials />
+      {/* Testimonials hidden until real testimonials are available */}
+      {/* <Testimonials /> */}
       <Footer />
       <ChatBot />
     </main>
