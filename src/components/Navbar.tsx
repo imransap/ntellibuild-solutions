@@ -37,7 +37,7 @@ export const Navbar = () => {
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
+          <Link to="/" className="flex items-center group -mt-2">
             <img src={SmartRunAILogo} alt="SmartRunAI Logo" className="h-32 w-auto" />
           </Link>
 
