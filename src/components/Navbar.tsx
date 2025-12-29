@@ -38,7 +38,7 @@ export const Navbar = () => {
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
-            <img src={SmartRunAILogo} alt="SmartRunAI Logo" className="h-24 w-auto" />
+            <img src={SmartRunAILogo} alt="SmartRunAI Logo" className="h-32 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
