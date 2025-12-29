@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 // Allowed origins for CORS
+// NOTE: The Lovable preview domain can vary (e.g. *.lovable.app), so we allow safe
+// preview origins via suffix matching.
 const ALLOWED_ORIGINS = [
   "https://smartrunai.com",
   "https://www.smartrunai.com",
@@ -10,28 +12,34 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
 ];
 
-// Check if origin matches allowed patterns (including lovableproject.com subdomains)
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
-  // Allow any lovableproject.com subdomain for preview
-  if (origin.endsWith('.lovableproject.com')) return true;
+
+  // Allow Lovable preview subdomains
+  if (origin.endsWith(".lovableproject.com")) return true;
+  if (origin.endsWith(".lovable.app")) return true;
+
   return false;
+}
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  // If origin is not recognized, use '*' to avoid breaking previews.
+  const allowedOrigin = isAllowedOrigin(origin) ? origin! : "*";
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
 }
 
 // Simple in-memory rate limiting (per IP, resets on function restart)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_MAX = 20; // Max 20 requests per minute for chatbot
 const RATE_LIMIT_WINDOW = 60000; // 1 minute in ms
-
-function getCorsHeaders(origin: string | null): Record<string, string> {
-  const allowedOrigin = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-}
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
