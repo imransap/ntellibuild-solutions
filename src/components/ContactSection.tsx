@@ -56,7 +56,33 @@ export const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/25696856/uwmyj0o/";
+
     try {
+      // Send to Zapier webhook for Google Sheets
+      fetch(zapierWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          formType: "contact",
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          industry: formData.industry,
+          budget: formData.budget,
+          source: formData.source,
+          message: formData.message,
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch((error) => {
+        console.error("Error sending to Zapier:", error);
+      });
+
+      // Also send email notification
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
           formType: "contact",
