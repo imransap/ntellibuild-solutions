@@ -90,12 +90,27 @@ const WEBSITE_PAGES = [
 
 // Function to fetch and extract text content from a webpage
 async function fetchPageContent(url: string): Promise<string> {
-  try {
+  const stripHtmlToText = (html: string) =>
+    html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .trim();
+
+  const fetchDirect = async (): Promise<string> => {
     const response = await fetch(url, {
       client: FETCH_CLIENT,
       redirect: "follow",
       headers: {
-        // Keep headers minimal; UA can trigger bot defenses on some hosts.
         "Accept": "text/html,application/xhtml+xml",
       },
     });
@@ -106,31 +121,43 @@ async function fetchPageContent(url: string): Promise<string> {
     }
 
     const html = await response.text();
+    return stripHtmlToText(html).substring(0, 5000);
+  };
 
-    // Extract text content from HTML (simple extraction)
-    // Remove script and style tags first
-    let text = html
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
-      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
-      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
-      // Remove HTML tags but keep content
-      .replace(/<[^>]+>/g, " ")
-      // Clean up whitespace
-      .replace(/\s+/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"')
-      .trim();
+  const fetchViaJina = async (): Promise<string> => {
+    // Jina AI text proxy (no key) helps when TLS/HTTP2 handshakes fail in edge runtime.
+    // It returns page content as readable text/markdown.
+    const proxyUrl = `https://r.jina.ai/${url}`;
+    const response = await fetch(proxyUrl, {
+      client: FETCH_CLIENT,
+      redirect: "follow",
+      headers: { "Accept": "text/plain" },
+    });
 
-    return text.substring(0, 5000); // Limit per page
+    if (!response.ok) {
+      console.log(`Failed to fetch via Jina ${url}: ${response.status}`);
+      return "";
+    }
+
+    const text = (await response.text()).replace(/\s+/g, " ").trim();
+    return text.substring(0, 5000);
+  };
+
+  try {
+    const direct = await fetchDirect();
+    if (direct) return direct;
   } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-    return "";
+    console.error(`Direct fetch error for ${url}:`, error);
   }
+
+  try {
+    const proxied = await fetchViaJina();
+    if (proxied) return proxied;
+  } catch (error) {
+    console.error(`Jina fetch error for ${url}:`, error);
+  }
+
+  return "";
 }
 
 // Function to get dynamic website content
@@ -388,33 +415,38 @@ We understand that every business is unique. That's why we don't believe in one-
 - Excellence: We maintain the highest standards in every solution we deliver, ensuring quality and reliability.
 `;
 
+// Keep the full knowledge base above intact (as requested), but use a concise summary
+// in the model prompt to reduce token usage/cost.
+const KNOWLEDGE_BASE_SUMMARY = `
+Smart Run AI is an AI automation agency for SMBs.
+Core offerings: workflow automation (n8n/Make/Zapier), AI chatbots/assistants, RPA, lead-gen automation, and data extraction + analytics.
+Process: discovery call → process mapping → solution design → build/test → deploy/train → ongoing support.
+Getting started: book a free automation audit (click "Book a Demo").
+Contact: info@smartrunai.com.
+`;
+
 // Build system prompt with dynamic website content
 async function buildSystemPrompt(): Promise<string> {
   const websiteContent = await getWebsiteContent();
-  
+
   return `You are SmartRunAI's intelligent assistant. Your role is to help visitors learn about Smart Run AI's automation services and guide them toward booking a consultation.
 
-KNOWLEDGE BASE (from training documents):
-${KNOWLEDGE_BASE}
+KNOWLEDGE BASE (summary from training documents):
+${KNOWLEDGE_BASE_SUMMARY}
 
 LIVE WEBSITE CONTENT (dynamically updated):
 ${websiteContent}
 
 IMPORTANT INSTRUCTIONS:
 1. Be friendly, professional, and helpful.
-2. Answer questions based on BOTH the knowledge base AND the live website content provided above.
-3. The live website content is updated regularly, so always check there for the latest information.
-4. If asked about something not covered in either source, politely say you don't have that specific information and suggest they contact the team or book a demo for personalized assistance.
+2. Answer questions based on BOTH the knowledge base summary AND the live website content provided above.
+3. If the live website content is empty/unavailable, answer from the knowledge base summary and known business info.
+4. If asked about something not covered, politely say you don't have that specific information and suggest they contact the team or book a demo.
 5. DO NOT discuss specific pricing. If asked about cost, respond: "Pricing is customized based on your specific needs. I'd recommend booking a free consultation where our team can provide a tailored quote based on your requirements."
-6. Encourage users to book a demo for personalized advice. Simply tell them to click the "Book a Demo" button on the website - do NOT include any raw URLs or link fragments in your responses.
-7. Keep responses concise but informative (2-4 sentences typically).
-8. Use a warm, conversational tone.
-9. When discussing services, provide relevant examples and use cases.
-10. If users ask how to get started, always guide them to book a free automation audit by clicking the "Book a Demo" button.
-11. If users ask about the intake form, tell them it's on the "Intake" page (accessible from the website navigation) and they can submit it there.
-12. For contact, provide: email info@smartrunai.com or suggest booking a demo.
-13. NEVER include raw URLs, link fragments, or technical links like "?book-demo=true" in your responses. Instead, just tell users to click the appropriate button on the website.
-14. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
+6. Encourage users to book a demo: tell them to click the "Book a Demo" button (do NOT include raw URLs or link fragments).
+7. Keep responses concise (2-4 sentences).
+8. If users ask about the intake form, tell them it's on the "Intake" page (accessible from the website navigation) and they can submit it there.
+9. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
 
 Remember: Your goal is to be helpful and encourage visitors to take the next step with SmartRunAI.`;
 }
@@ -426,6 +458,16 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const sseText = (text: string) => {
+    const payload = {
+      choices: [{ index: 0, delta: { role: "assistant", content: text } }],
+    };
+    const body = `data: ${JSON.stringify(payload)}\n\n` + "data: [DONE]\n\n";
+    return new Response(body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
+  };
 
   try {
     // Rate limiting check
@@ -441,7 +483,7 @@ serve(async (req) => {
     // Parse and validate input
     const rawData = await req.json();
     const validationResult = ChatRequestSchema.safeParse(rawData);
-    
+
     if (!validationResult.success) {
       console.error("Validation error:", validationResult.error.errors);
       return new Response(
@@ -451,8 +493,20 @@ serve(async (req) => {
     }
 
     const { messages } = validationResult.data;
+
+    // Fast-path common questions to avoid unnecessary model calls (reduces cost).
+    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content?.toLowerCase() || "";
+    if (lastUser.includes("intake") && lastUser.includes("form")) {
+      return sseText(
+        "You can find the Intake Form on the \"Intake\" page (it’s in the website navigation). Open the Intake page and submit the form there."
+      );
+    }
+    if (lastUser.includes("location") || lastUser.includes("where are you") || lastUser.includes("where is your office")) {
+      return sseText("Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.");
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
+
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
@@ -468,10 +522,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
+        messages: [{ role: "system", content: systemPrompt }, ...messages],
         stream: true,
       }),
     });
