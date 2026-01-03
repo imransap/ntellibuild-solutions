@@ -445,7 +445,7 @@ IMPORTANT INSTRUCTIONS:
 5. DO NOT discuss specific pricing. If asked about cost, respond: "Pricing is customized based on your specific needs. I'd recommend booking a free consultation where our team can provide a tailored quote based on your requirements."
 6. Encourage users to book a demo: tell them to click the "Book a Demo" button (do NOT include raw URLs or link fragments).
 7. Keep responses concise (2-4 sentences).
-8. If users ask about the intake form, tell them it's on the "Intake" page (accessible from the website navigation) and they can submit it there.
+8. If users ask about the intake form, tell them to click the "Get Started" button on the website, which takes them to the Intake Form page where they can submit the form.
 9. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
 
 Remember: Your goal is to be helpful and encourage visitors to take the next step with SmartRunAI.`;
@@ -498,7 +498,7 @@ serve(async (req) => {
     const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content?.toLowerCase() || "";
     if (lastUser.includes("intake") && lastUser.includes("form")) {
       return sseText(
-        "You can find the Intake Form on the \"Intake\" page (it’s in the website navigation). Open the Intake page and submit the form there."
+        "Click the \"Get Started\" button on the website. It will take you to the Intake Form page, where you can fill it out and submit it."
       );
     }
     if (lastUser.includes("location") || lastUser.includes("where are you") || lastUser.includes("where is your office")) {
