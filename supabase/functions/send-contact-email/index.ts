@@ -72,7 +72,7 @@ function escapeHtml(text: string | undefined | null): string {
 
 // Input validation schema
 const ContactFormSchema = z.object({
-  formType: z.enum(["demo", "contact"]),
+  formType: z.enum(["demo", "contact", "intake"]),
   firstName: z.string().min(1).max(50).regex(/^[a-zA-Z\s\-']+$/, "Invalid characters in first name"),
   lastName: z.string().min(1).max(50).regex(/^[a-zA-Z\s\-']+$/, "Invalid characters in last name"),
   email: z.string().email().max(255),
@@ -84,6 +84,23 @@ const ContactFormSchema = z.object({
   companyName: z.string().max(100).optional(),
   companySize: z.string().max(50).optional(),
   projectDescription: z.string().max(2000).optional(),
+  // Additional intake form fields
+  jobTitle: z.string().max(100).optional(),
+  businessType: z.string().max(100).optional(),
+  industryOther: z.string().max(100).optional(),
+  website: z.string().max(255).optional(),
+  automationGoals: z.string().max(500).optional(),
+  automationGoalsOther: z.string().max(255).optional(),
+  primaryChallenge: z.string().max(2000).optional(),
+  currentTools: z.string().max(500).optional(),
+  currentToolsOther: z.string().max(255).optional(),
+  currentProcessDescription: z.string().max(2000).optional(),
+  timeline: z.string().max(100).optional(),
+  additionalNotes: z.string().max(2000).optional(),
+  hearAboutUs: z.string().max(100).optional(),
+  hearAboutUsOther: z.string().max(255).optional(),
+  referralName: z.string().max(100).optional(),
+  timestamp: z.string().optional(),
 });
 
 const handler = async (req: Request): Promise<Response> => {
@@ -148,12 +165,12 @@ const handler = async (req: Request): Promise<Response> => {
     const safeCompanySize = escapeHtml(companySize);
     const safeProjectDescription = escapeHtml(projectDescription);
 
-    const subject = formType === "demo" 
-      ? `New Demo Request from ${safeFirstName} ${safeLastName}`
-      : `New Contact Form Submission from ${safeFirstName} ${safeLastName}`;
-
-    const htmlContent = formType === "demo" 
-      ? `
+    let subject: string;
+    let htmlContent: string;
+    
+    if (formType === "demo") {
+      subject = `New Demo Request from ${safeFirstName} ${safeLastName}`;
+      htmlContent = `
         <h1>New Demo Request</h1>
         <h2>Contact Information</h2>
         <ul>
@@ -177,8 +194,72 @@ const handler = async (req: Request): Promise<Response> => {
         
         <h2>Project Description</h2>
         <p>${safeProjectDescription || "Not provided"}</p>
-      `
-      : `
+      `;
+    } else if (formType === "intake") {
+      subject = `New Intake Form Submission from ${safeFirstName} ${safeLastName}`;
+      const safeJobTitle = escapeHtml(data.jobTitle);
+      const safeBusinessType = escapeHtml(data.businessType);
+      const safeIndustryOther = escapeHtml(data.industryOther);
+      const safeWebsite = escapeHtml(data.website);
+      const safeAutomationGoals = escapeHtml(data.automationGoals);
+      const safeAutomationGoalsOther = escapeHtml(data.automationGoalsOther);
+      const safePrimaryChallenge = escapeHtml(data.primaryChallenge);
+      const safeCurrentTools = escapeHtml(data.currentTools);
+      const safeCurrentToolsOther = escapeHtml(data.currentToolsOther);
+      const safeCurrentProcessDescription = escapeHtml(data.currentProcessDescription);
+      const safeTimeline = escapeHtml(data.timeline);
+      const safeAdditionalNotes = escapeHtml(data.additionalNotes);
+      const safeHearAboutUs = escapeHtml(data.hearAboutUs);
+      const safeHearAboutUsOther = escapeHtml(data.hearAboutUsOther);
+      const safeReferralName = escapeHtml(data.referralName);
+      
+      htmlContent = `
+        <h1>New Intake Form Submission</h1>
+        
+        <h2>Contact Information</h2>
+        <ul>
+          <li><strong>Name:</strong> ${safeFirstName} ${safeLastName}</li>
+          <li><strong>Email:</strong> ${safeEmail}</li>
+          <li><strong>Phone:</strong> ${safePhone || "Not provided"}</li>
+          <li><strong>Job Title:</strong> ${safeJobTitle || "Not provided"}</li>
+        </ul>
+        
+        <h2>Business Details</h2>
+        <ul>
+          <li><strong>Company Name:</strong> ${safeCompanyName || "Not provided"}</li>
+          <li><strong>Business Type:</strong> ${safeBusinessType || "Not provided"}</li>
+          <li><strong>Industry:</strong> ${safeIndustry || "Not provided"}${safeIndustryOther ? ` (${safeIndustryOther})` : ""}</li>
+          <li><strong>Website:</strong> ${safeWebsite || "Not provided"}</li>
+        </ul>
+        
+        <h2>Automation Goals</h2>
+        <ul>
+          <li><strong>Goals:</strong> ${safeAutomationGoals || "Not provided"}${safeAutomationGoalsOther ? ` (Other: ${safeAutomationGoalsOther})` : ""}</li>
+          <li><strong>Primary Challenge:</strong> ${safePrimaryChallenge || "Not provided"}</li>
+        </ul>
+        
+        <h2>Current Tools & Processes</h2>
+        <ul>
+          <li><strong>Current Tools:</strong> ${safeCurrentTools || "Not provided"}${safeCurrentToolsOther ? ` (Other: ${safeCurrentToolsOther})` : ""}</li>
+          <li><strong>Current Process Description:</strong> ${safeCurrentProcessDescription || "Not provided"}</li>
+        </ul>
+        
+        <h2>Budget & Timeline</h2>
+        <ul>
+          <li><strong>Budget:</strong> ${safeBudget || "Not provided"}</li>
+          <li><strong>Timeline:</strong> ${safeTimeline || "Not provided"}</li>
+        </ul>
+        
+        <h2>Additional Information</h2>
+        <ul>
+          <li><strong>Additional Notes:</strong> ${safeAdditionalNotes || "Not provided"}</li>
+          <li><strong>How they heard about us:</strong> ${safeHearAboutUs || "Not provided"}${safeHearAboutUsOther ? ` (${safeHearAboutUsOther})` : ""}</li>
+          <li><strong>Referral Name:</strong> ${safeReferralName || "Not provided"}</li>
+        </ul>
+      `;
+    } else {
+      subject = `New Contact Form Submission from ${safeFirstName} ${safeLastName}`;
+      htmlContent = `
         <h1>New Contact Form Submission</h1>
         <h2>Contact Information</h2>
         <ul>
@@ -197,6 +278,7 @@ const handler = async (req: Request): Promise<Response> => {
         <h2>Message</h2>
         <p>${safeMessage || "Not provided"}</p>
       `;
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
