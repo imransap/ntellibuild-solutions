@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Mail, Phone, MapPin, Loader2, Send } from "lucide-react";
+import { Mail, MapPin, Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const industries = [
@@ -45,7 +45,6 @@ export const ContactSection = () => {
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
     industry: "",
     budget: "",
     source: "",
@@ -71,7 +70,6 @@ export const ContactSection = () => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          phone: formData.phone,
           industry: formData.industry,
           budget: formData.budget,
           source: formData.source,
@@ -89,7 +87,6 @@ export const ContactSection = () => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          phone: formData.phone,
           industry: formData.industry,
           budget: formData.budget,
           source: formData.source,
@@ -107,7 +104,6 @@ export const ContactSection = () => {
         firstName: "",
         lastName: "",
         email: "",
-        phone: "",
         industry: "",
         budget: "",
         source: "",
@@ -160,27 +156,13 @@ export const ContactSection = () => {
             <div className="glass-card rounded-xl p-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-crimson/10 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-crimson" />
-                </div>
-                <div>
-                  <h3 className="font-display font-semibold text-foreground">Phone</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    +1 (555) 123-4567
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-crimson/10 flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5 text-crimson" />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-foreground">Location</h3>
                   <p className="text-muted-foreground text-sm mt-1">
-                    San Francisco, CA<br />
-                    United States
+                    Toronto, Ontario, CA<br />
+                    New York, NY, US
                   </p>
                 </div>
               </div>
@@ -215,31 +197,17 @@ export const ContactSection = () => {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="john@company.com"
-                    className="bg-secondary/50 border-border/50"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone *</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+1 (555) 000-0000"
-                    className="bg-secondary/50 border-border/50"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="john@company.com"
+                  className="bg-secondary/50 border-border/50"
+                />
               </div>
 
               <div className="grid sm:grid-cols-3 gap-6">
