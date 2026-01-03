@@ -496,13 +496,78 @@ serve(async (req) => {
 
     // Fast-path common questions to avoid unnecessary model calls (reduces cost).
     const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content?.toLowerCase() || "";
+    
+    // Intake form / Get Started
     if (lastUser.includes("intake") && lastUser.includes("form")) {
       return sseText(
         "Click the \"Get Started\" button on the website. It will take you to the Intake Form page, where you can fill it out and submit it."
       );
     }
-    if (lastUser.includes("location") || lastUser.includes("where are you") || lastUser.includes("where is your office")) {
+    if (lastUser.includes("get started") || lastUser.includes("getstarted")) {
+      return sseText(
+        "Click the \"Get Started\" button in the navigation bar. It will take you to our Intake Form where you can tell us about your business needs."
+      );
+    }
+    
+    // Location
+    if (lastUser.includes("location") || lastUser.includes("where are you") || lastUser.includes("where is your office") || lastUser.includes("address")) {
       return sseText("Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.");
+    }
+    
+    // FAQs
+    if (lastUser.includes("faq") || lastUser.includes("frequently asked") || lastUser.includes("common question")) {
+      return sseText(
+        "You can find answers to frequently asked questions on our FAQs page. Click \"FAQs\" in the navigation menu to learn more about our services, process, and policies."
+      );
+    }
+    
+    // Services
+    if ((lastUser.includes("service") || lastUser.includes("what do you do") || lastUser.includes("what does smart run") || lastUser.includes("what can you")) && !lastUser.includes("book") && !lastUser.includes("demo")) {
+      return sseText(
+        "Smart Run AI offers AI-powered automation solutions including workflow automation, custom AI assistants, data processing, and system integrations. Click \"Services\" in the navigation menu to explore our full offerings, or click \"Get Started\" to tell us about your needs."
+      );
+    }
+    
+    // Contact
+    if (lastUser.includes("contact") || lastUser.includes("reach you") || lastUser.includes("get in touch") || lastUser.includes("email") || lastUser.includes("phone")) {
+      return sseText(
+        "You can reach us through our Contact page—click \"Contact\" in the navigation menu. You can also book a free demo by clicking \"Book a Demo\" to speak directly with our team."
+      );
+    }
+    
+    // Book a Demo
+    if (lastUser.includes("book") && (lastUser.includes("demo") || lastUser.includes("call") || lastUser.includes("meeting") || lastUser.includes("consultation"))) {
+      return sseText(
+        "Click the \"Book a Demo\" button on the website to schedule a free consultation with our team. We'll discuss your business needs and show you how Smart Run AI can help."
+      );
+    }
+    
+    // About
+    if (lastUser.includes("about") && (lastUser.includes("smart run") || lastUser.includes("company") || lastUser.includes("who are") || lastUser.includes("tell me about"))) {
+      return sseText(
+        "Smart Run AI helps businesses automate their operations using AI-powered solutions. Click \"About\" in the navigation menu to learn more about our mission and team, or click \"Get Started\" to begin your automation journey."
+      );
+    }
+    
+    // Solutions
+    if (lastUser.includes("solution") || lastUser.includes("industry") || lastUser.includes("use case")) {
+      return sseText(
+        "We offer tailored AI solutions for various industries and use cases. Click \"Solutions\" in the navigation menu to explore how we can help your specific business, or click \"Get Started\" to discuss your needs."
+      );
+    }
+    
+    // Pricing (always redirect to demo)
+    if (lastUser.includes("price") || lastUser.includes("pricing") || lastUser.includes("cost") || lastUser.includes("how much")) {
+      return sseText(
+        "Pricing is customized based on your specific needs. Click \"Book a Demo\" to schedule a free consultation where our team can provide a tailored quote based on your requirements."
+      );
+    }
+    
+    // Greetings
+    if (lastUser.match(/^(hi|hello|hey|good morning|good afternoon|good evening)[\s!.?]*$/i)) {
+      return sseText(
+        "Hello! Welcome to Smart Run AI. I'm here to help you learn about our AI automation solutions. How can I assist you today?"
+      );
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
