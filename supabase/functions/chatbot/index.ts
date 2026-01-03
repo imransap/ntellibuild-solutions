@@ -68,6 +68,100 @@ const ChatRequestSchema = z.object({
   messages: z.array(MessageSchema).max(50),
 });
 
+// Cache for website content (refreshes every 30 minutes)
+let websiteContentCache: { content: string; timestamp: number } | null = null;
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+// Website pages to scrape for dynamic content
+const WEBSITE_PAGES = [
+  "https://smartrunai.com/",
+  "https://smartrunai.com/services",
+  "https://smartrunai.com/solutions",
+  "https://smartrunai.com/about",
+  "https://smartrunai.com/faqs",
+  "https://smartrunai.com/contact",
+];
+
+// Function to fetch and extract text content from a webpage
+async function fetchPageContent(url: string): Promise<string> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "SmartRunAI-Bot/1.0",
+        "Accept": "text/html",
+      },
+    });
+    
+    if (!response.ok) {
+      console.log(`Failed to fetch ${url}: ${response.status}`);
+      return "";
+    }
+    
+    const html = await response.text();
+    
+    // Extract text content from HTML (simple extraction)
+    // Remove script and style tags first
+    let text = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+      .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, "")
+      // Remove HTML tags but keep content
+      .replace(/<[^>]+>/g, " ")
+      // Clean up whitespace
+      .replace(/\s+/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .trim();
+    
+    return text.substring(0, 5000); // Limit per page
+  } catch (error) {
+    console.error(`Error fetching ${url}:`, error);
+    return "";
+  }
+}
+
+// Function to get dynamic website content
+async function getWebsiteContent(): Promise<string> {
+  const now = Date.now();
+  
+  // Return cached content if still valid
+  if (websiteContentCache && (now - websiteContentCache.timestamp) < CACHE_DURATION) {
+    console.log("Using cached website content");
+    return websiteContentCache.content;
+  }
+  
+  console.log("Fetching fresh website content...");
+  
+  try {
+    const pageContents = await Promise.all(
+      WEBSITE_PAGES.map(async (url) => {
+        const content = await fetchPageContent(url);
+        const pageName = url.split("/").pop() || "home";
+        return content ? `\n### Content from ${pageName} page:\n${content}` : "";
+      })
+    );
+    
+    const combinedContent = pageContents.filter(Boolean).join("\n\n");
+    
+    // Cache the result
+    websiteContentCache = {
+      content: combinedContent,
+      timestamp: now,
+    };
+    
+    console.log("Website content fetched and cached successfully");
+    return combinedContent;
+  } catch (error) {
+    console.error("Error fetching website content:", error);
+    return websiteContentCache?.content || "";
+  }
+}
+
 const KNOWLEDGE_BASE = `
 # Smart Run AI – Complete Knowledge Base
 
@@ -281,24 +375,33 @@ We understand that every business is unique. That's why we don't believe in one-
 - Excellence: We maintain the highest standards in every solution we deliver, ensuring quality and reliability.
 `;
 
-const SYSTEM_PROMPT = `You are SmartRunAI's intelligent assistant. Your role is to help visitors learn about Smart Run AI's automation services and guide them toward booking a consultation.
+// Build system prompt with dynamic website content
+async function buildSystemPrompt(): Promise<string> {
+  const websiteContent = await getWebsiteContent();
+  
+  return `You are SmartRunAI's intelligent assistant. Your role is to help visitors learn about Smart Run AI's automation services and guide them toward booking a consultation.
 
-KNOWLEDGE BASE:
+KNOWLEDGE BASE (from training documents):
 ${KNOWLEDGE_BASE}
+
+LIVE WEBSITE CONTENT (dynamically updated):
+${websiteContent}
 
 IMPORTANT INSTRUCTIONS:
 1. Be friendly, professional, and helpful.
-2. Answer questions based ONLY on the knowledge base provided above.
-3. If asked about something not in the knowledge base, politely say you don't have that specific information and suggest they contact the team or book a demo for personalized assistance.
-4. DO NOT discuss specific pricing. If asked about cost, respond: "Pricing is customized based on your specific needs. I'd recommend booking a free consultation where our team can provide a tailored quote based on your requirements."
-5. Encourage users to book a demo for personalized advice. Mention they can click the "Book a Demo" button or use the link: ?book-demo=true
-6. Keep responses concise but informative (2-4 sentences typically).
-7. Use a warm, conversational tone.
-8. When discussing services, provide relevant examples and use cases.
-9. If users ask how to get started, always guide them to book a free automation audit.
-10. For contact, provide: email info@smartrunai.com or suggest booking a demo.
+2. Answer questions based on BOTH the knowledge base AND the live website content provided above.
+3. The live website content is updated regularly, so always check there for the latest information.
+4. If asked about something not covered in either source, politely say you don't have that specific information and suggest they contact the team or book a demo for personalized assistance.
+5. DO NOT discuss specific pricing. If asked about cost, respond: "Pricing is customized based on your specific needs. I'd recommend booking a free consultation where our team can provide a tailored quote based on your requirements."
+6. Encourage users to book a demo for personalized advice. Mention they can click the "Book a Demo" button or use the link: ?book-demo=true
+7. Keep responses concise but informative (2-4 sentences typically).
+8. Use a warm, conversational tone.
+9. When discussing services, provide relevant examples and use cases.
+10. If users ask how to get started, always guide them to book a free automation audit.
+11. For contact, provide: email info@smartrunai.com or suggest booking a demo.
 
 Remember: Your goal is to be helpful and encourage visitors to take the next step with SmartRunAI.`;
+}
 
 serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -338,6 +441,9 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Build system prompt with dynamic website content
+    const systemPrompt = await buildSystemPrompt();
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -347,7 +453,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
