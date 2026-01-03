@@ -72,33 +72,41 @@ const ChatRequestSchema = z.object({
 let websiteContentCache: { content: string; timestamp: number } | null = null;
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
+// Use an explicit HTTP client to improve compatibility with some TLS/HTTP2 setups
+// (We disable HTTP/2 because some hosts intermittently fail handshakes in edge runtimes.)
+const FETCH_CLIENT = Deno.createHttpClient({ http2: false });
+
 // Website pages to scrape for dynamic content
+// Prefer www.* to avoid redirect/TLS edge cases.
 const WEBSITE_PAGES = [
-  "https://smartrunai.com/",
-  "https://smartrunai.com/services",
-  "https://smartrunai.com/solutions",
-  "https://smartrunai.com/about",
-  "https://smartrunai.com/faqs",
-  "https://smartrunai.com/contact",
+  "https://www.smartrunai.com/",
+  "https://www.smartrunai.com/services",
+  "https://www.smartrunai.com/solutions",
+  "https://www.smartrunai.com/about",
+  "https://www.smartrunai.com/faqs",
+  "https://www.smartrunai.com/contact",
+  "https://www.smartrunai.com/intake",
 ];
 
 // Function to fetch and extract text content from a webpage
 async function fetchPageContent(url: string): Promise<string> {
   try {
     const response = await fetch(url, {
+      client: FETCH_CLIENT,
+      redirect: "follow",
       headers: {
-        "User-Agent": "SmartRunAI-Bot/1.0",
-        "Accept": "text/html",
+        // Keep headers minimal; UA can trigger bot defenses on some hosts.
+        "Accept": "text/html,application/xhtml+xml",
       },
     });
-    
+
     if (!response.ok) {
       console.log(`Failed to fetch ${url}: ${response.status}`);
       return "";
     }
-    
+
     const html = await response.text();
-    
+
     // Extract text content from HTML (simple extraction)
     // Remove script and style tags first
     let text = html
@@ -117,7 +125,7 @@ async function fetchPageContent(url: string): Promise<string> {
       .replace(/&gt;/g, ">")
       .replace(/&quot;/g, '"')
       .trim();
-    
+
     return text.substring(0, 5000); // Limit per page
   } catch (error) {
     console.error(`Error fetching ${url}:`, error);
@@ -128,32 +136,37 @@ async function fetchPageContent(url: string): Promise<string> {
 // Function to get dynamic website content
 async function getWebsiteContent(): Promise<string> {
   const now = Date.now();
-  
+
   // Return cached content if still valid
   if (websiteContentCache && (now - websiteContentCache.timestamp) < CACHE_DURATION) {
     console.log("Using cached website content");
     return websiteContentCache.content;
   }
-  
+
   console.log("Fetching fresh website content...");
-  
+
   try {
     const pageContents = await Promise.all(
       WEBSITE_PAGES.map(async (url) => {
         const content = await fetchPageContent(url);
-        const pageName = url.split("/").pop() || "home";
-        return content ? `\n### Content from ${pageName} page:\n${content}` : "";
+        const pageName = url.replace("https://", "").replace("http://", "");
+        return content ? `\n### Content from ${pageName}:\n${content}` : "";
       })
     );
-    
-    const combinedContent = pageContents.filter(Boolean).join("\n\n");
-    
-    // Cache the result
+
+    const combinedContent = pageContents.filter(Boolean).join("\n\n").trim();
+
+    // If scraping fails (empty content), do NOT overwrite a previously good cache.
+    if (!combinedContent) {
+      console.warn("Website scraping returned empty content; keeping previous cache if available.");
+      return websiteContentCache?.content || "";
+    }
+
     websiteContentCache = {
       content: combinedContent,
       timestamp: now,
     };
-    
+
     console.log("Website content fetched and cached successfully");
     return combinedContent;
   } catch (error) {
@@ -398,9 +411,10 @@ IMPORTANT INSTRUCTIONS:
 8. Use a warm, conversational tone.
 9. When discussing services, provide relevant examples and use cases.
 10. If users ask how to get started, always guide them to book a free automation audit by clicking the "Book a Demo" button.
-11. For contact, provide: email info@smartrunai.com or suggest booking a demo.
-12. NEVER include raw URLs, link fragments, or technical links like "?book-demo=true" in your responses. Instead, just tell users to click the appropriate button on the website.
-13. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
+11. If users ask about the intake form, tell them it's on the "Intake" page (accessible from the website navigation) and they can submit it there.
+12. For contact, provide: email info@smartrunai.com or suggest booking a demo.
+13. NEVER include raw URLs, link fragments, or technical links like "?book-demo=true" in your responses. Instead, just tell users to click the appropriate button on the website.
+14. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
 
 Remember: Your goal is to be helpful and encourage visitors to take the next step with SmartRunAI.`;
 }
