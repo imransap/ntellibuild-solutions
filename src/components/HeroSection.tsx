@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Sparkles, Zap, Bot, BarChart3 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BookDemoModal } from "./BookDemoModal";
 
 const floatingIcons = [
@@ -12,6 +13,7 @@ const floatingIcons = [
 
 export const HeroSection = () => {
   const [isBookDemoOpen, setIsBookDemoOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -75,9 +77,9 @@ export const HeroSection = () => {
               <Button
                 variant="hero"
                 size="xl"
-                onClick={() => setIsBookDemoOpen(true)}
+                onClick={() => navigate("/intake")}
               >
-                Get Started Free
+                Get Started
                 <ArrowRight className="w-5 h-5" />
               </Button>
               <Button variant="glass" size="xl">
