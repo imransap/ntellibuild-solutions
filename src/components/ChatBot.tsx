@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
@@ -31,6 +32,7 @@ export const ChatBot = () => {
   const [showBookDemo, setShowBookDemo] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,13 +42,16 @@ export const ChatBot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Render message text with clickable "Book a Demo" links
+  // Render message text with clickable links for "Book a Demo" and "Get Started"
   const renderMessageWithLinks = (text: string) => {
-    const bookDemoRegex = /(book a demo)/gi;
-    const parts = text.split(bookDemoRegex);
+    // Combined regex to match both "book a demo" and "Get Started"
+    const linkRegex = /(book a demo|"Get Started"|Get Started)/gi;
+    const parts = text.split(linkRegex);
     
     return parts.map((part, index) => {
-      if (part.toLowerCase() === "book a demo") {
+      const lowerPart = part.toLowerCase();
+      
+      if (lowerPart === "book a demo") {
         return (
           <button
             key={index}
@@ -57,6 +62,22 @@ export const ChatBot = () => {
           </button>
         );
       }
+      
+      if (lowerPart === "get started" || lowerPart === '"get started"') {
+        return (
+          <button
+            key={index}
+            onClick={() => {
+              setIsOpen(false);
+              navigate("/intake");
+            }}
+            className="text-crimson underline hover:text-crimson-dark font-medium cursor-pointer"
+          >
+            Get Started
+          </button>
+        );
+      }
+      
       return part;
     });
   };
