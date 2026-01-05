@@ -88,23 +88,20 @@ export const HeroSection = () => {
               </Button>
             </div>
 
-            {/* Video Placeholder */}
+            {/* Video Section */}
             <div
               className="mt-16 max-w-4xl mx-auto animate-fade-in"
               style={{ animationDelay: "0.4s" }}
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden glass border border-border/50">
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/30">
-                  <div className="w-20 h-20 rounded-full bg-crimson/20 flex items-center justify-center mb-4 cursor-pointer hover:bg-crimson/30 transition-colors group">
-                    <Play className="w-8 h-8 text-crimson group-hover:scale-110 transition-transform" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Discover SmartRunAI
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    See how we transform businesses with intelligent automation
-                  </p>
-                </div>
+                <video
+                  className="w-full h-full object-cover"
+                  controls
+                  poster=""
+                >
+                  <source src="/videos/SmartRunAI_1.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </div>
