@@ -134,9 +134,6 @@ export const Footer = () => {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} SmartRunAI. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Made with ❤️ for automation enthusiasts
-          </p>
         </div>
       </div>
     </footer>
