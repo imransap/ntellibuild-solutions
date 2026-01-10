@@ -446,7 +446,7 @@ IMPORTANT INSTRUCTIONS:
 6. Encourage users to book a demo: tell them to click the "Book a Demo" button (do NOT include raw URLs or link fragments).
 7. Keep responses concise (2-4 sentences).
 8. If users ask about the intake form, tell them to click the "Get Started" button on the website, which takes them to the Intake Form page where they can submit the form.
-9. For location questions: Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.
+9. For location questions: Smart Run AI is located in Toronto, Ontario, CA.
 
 Remember: Your goal is to be helpful and encourage visitors to take the next step with SmartRunAI.`;
 }
