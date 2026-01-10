@@ -510,8 +510,13 @@ serve(async (req) => {
     }
     
     // Location
-    if (lastUser.includes("location") || lastUser.includes("where are you") || lastUser.includes("where is your office") || lastUser.includes("address")) {
-      return sseText("Smart Run AI has offices in Toronto, Ontario, CA and New York, NY, US.");
+    if (
+      lastUser.includes("location") ||
+      lastUser.includes("where are you") ||
+      lastUser.includes("where is your office") ||
+      lastUser.includes("address")
+    ) {
+      return sseText("Smart Run AI is located in Toronto, Ontario, CA.");
     }
     
     // FAQs
