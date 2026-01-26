@@ -1,7 +1,20 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ChatBot } from "@/components/ChatBot";
-import { Users, Target, Lightbulb, Award } from "lucide-react";
+import { Users, Target, Lightbulb, Award, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+
+import carousel1 from "@/assets/carousel-1.png";
+import carousel2 from "@/assets/carousel-2.png";
+import carousel3 from "@/assets/carousel-3.png";
+import carousel4 from "@/assets/carousel-4.png";
+
+const carouselImages = [
+  { src: carousel1, alt: "Transforming Businesses Through Automation" },
+  { src: carousel2, alt: "Step 1: Discover & Analyze" },
+  { src: carousel3, alt: "Step 2: Design & Integrate" },
+  { src: carousel4, alt: "Step 3: Launch & Scale" },
+];
 
 const values = [
   {
@@ -27,6 +40,22 @@ const values = [
 ];
 
 const About = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(nextSlide, 4000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, nextSlide]);
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
@@ -75,17 +104,54 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-video rounded-2xl overflow-hidden border border-border/30 bg-background">
-                <video 
-                  className="w-full h-full object-cover"
-                  controls
-                  preload="metadata"
-                  poster="/videos/Smart_Run_AI_poster.jpg"
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsAutoPlaying(false)}
+              onMouseLeave={() => setIsAutoPlaying(true)}
+            >
+              <div className="aspect-square rounded-2xl overflow-hidden border border-border/30 bg-background relative">
+                {carouselImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image.src}
+                    alt={image.alt}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                      index === currentSlide ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                ))}
+                
+                {/* Navigation Arrows */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                  aria-label="Previous slide"
                 >
-                  <source src="/videos/Smart_Run_AI.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                
+                {/* Dots Indicator */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {carouselImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                        index === currentSlide 
+                          ? "bg-crimson" 
+                          : "bg-foreground/30 hover:bg-foreground/50"
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
