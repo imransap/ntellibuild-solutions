@@ -4,16 +4,14 @@ import { ChatBot } from "@/components/ChatBot";
 import { Users, Target, Lightbulb, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
-import carousel1 from "@/assets/carousel-1-square.png";
-import carousel2 from "@/assets/carousel-2.png";
-import carousel3 from "@/assets/carousel-3.png";
-import carousel4 from "@/assets/carousel-4.png";
+import carousel1 from "@/assets/carousel-2.png";
+import carousel2 from "@/assets/carousel-3.png";
+import carousel3 from "@/assets/carousel-4.png";
 
 const carouselImages = [
-  { src: carousel1, alt: "Transforming Businesses Through Automation" },
-  { src: carousel2, alt: "Step 1: Discover & Analyze" },
-  { src: carousel3, alt: "Step 2: Design & Integrate" },
-  { src: carousel4, alt: "Step 3: Launch & Scale" },
+  { src: carousel1, alt: "Step 1: Discover & Analyze" },
+  { src: carousel2, alt: "Step 2: Design & Integrate" },
+  { src: carousel3, alt: "Step 3: Launch & Scale" },
 ];
 
 const values = [
