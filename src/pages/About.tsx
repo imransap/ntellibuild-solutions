@@ -4,7 +4,7 @@ import { ChatBot } from "@/components/ChatBot";
 import { Users, Target, Lightbulb, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
-import carousel1 from "@/assets/carousel-1.png";
+import carousel1 from "@/assets/carousel-1-square.png";
 import carousel2 from "@/assets/carousel-2.png";
 import carousel3 from "@/assets/carousel-3.png";
 import carousel4 from "@/assets/carousel-4.png";
@@ -115,9 +115,9 @@ const About = () => {
                     key={index}
                     src={image.src}
                     alt={image.alt}
-                    className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                       index === currentSlide ? "opacity-100" : "opacity-0"
-                    } ${index === 0 ? "object-contain" : "object-cover"}`}
+                    }`}
                   />
                 ))}
                 
