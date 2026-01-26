@@ -115,9 +115,9 @@ const About = () => {
                     key={index}
                     src={image.src}
                     alt={image.alt}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                    className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${
                       index === currentSlide ? "opacity-100" : "opacity-0"
-                    }`}
+                    } ${index === 0 ? "object-contain" : "object-cover"}`}
                   />
                 ))}
                 
