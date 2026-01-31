@@ -146,9 +146,12 @@ export const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-foreground">Email</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <a 
+                    href="mailto:info@smartrunai.com" 
+                    className="text-muted-foreground text-sm mt-1 hover:text-crimson transition-colors"
+                  >
                     info@smartrunai.com
-                  </p>
+                  </a>
                 </div>
               </div>
             </div>
