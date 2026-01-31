@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, Sparkles, Zap, Bot, BarChart3 } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Bot, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookDemoModal } from "./BookDemoModal";
@@ -69,9 +69,9 @@ export const HeroSection = () => {
               you focus on what matters—your customers.
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <div
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
+              className="flex items-center justify-center animate-fade-in"
               style={{ animationDelay: "0.3s" }}
             >
               <Button
@@ -82,15 +82,11 @@ export const HeroSection = () => {
                 Get Started
                 <ArrowRight className="w-5 h-5" />
               </Button>
-              <Button variant="glass" size="xl">
-                <Play className="w-5 h-5" />
-                Watch Demo
-              </Button>
             </div>
 
             {/* Video Section */}
             <div
-              className="mt-16 max-w-4xl mx-auto animate-fade-in"
+              className="mt-16 max-w-3xl mx-auto animate-fade-in"
               style={{ animationDelay: "0.4s" }}
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden glass border border-border/50">
