@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Mail, MapPin, Loader2, Send } from "lucide-react";
+import { Mail, Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const industries = [
@@ -153,19 +153,6 @@ export const ContactSection = () => {
               </div>
             </div>
 
-            <div className="glass-card rounded-xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-crimson/10 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-crimson" />
-                </div>
-                <div>
-                  <h3 className="font-display font-semibold text-foreground">Location</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Toronto, Ontario, CA
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Contact Form */}

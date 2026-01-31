@@ -1,4 +1,4 @@
-import { Linkedin, Twitter, Instagram, Facebook } from "lucide-react";
+import { Linkedin, Instagram, Facebook } from "lucide-react";
 
 const footerLinks = {
   company: [
@@ -28,7 +28,6 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
   { icon: Linkedin, href: "https://www.linkedin.com/company/smart-run-ai/", label: "LinkedIn" },
   { icon: Instagram, href: "https://www.instagram.com/smartrunai/", label: "Instagram" },
   { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61585859322605", label: "Facebook" },
