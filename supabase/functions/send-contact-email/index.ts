@@ -288,7 +288,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "SmartRunAI <onboarding@resend.dev>",
-        to: ["emailtoimran@gmail.com"],
+        to: ["info@smartrunai.com"],
         subject: subject,
         html: htmlContent,
         reply_to: email,

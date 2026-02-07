@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { BookDemoModal } from "./BookDemoModal";
 import SmartRunAILogo from "@/assets/SmartRunAI_new_logo.png";
 
@@ -67,7 +67,6 @@ export const Navbar = () => {
               onClick={() => navigate("/intake")}
             >
               Get Started
-              <ArrowRight className="w-4 h-4" />
             </Button>
             <Button
               variant="hero"
