@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Zap, Bot, BarChart3 } from "lucide-react";
+import { Sparkles, Zap, Bot, BarChart3 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { BookDemoModal } from "./BookDemoModal";
 
 const floatingIcons = [
@@ -13,7 +11,6 @@ const floatingIcons = [
 
 export const HeroSection = () => {
   const [isBookDemoOpen, setIsBookDemoOpen] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <>
@@ -69,19 +66,50 @@ export const HeroSection = () => {
               you focus on what matters—your customers.
             </p>
 
-            {/* CTA Button */}
+            {/* AI Automation Content Section */}
             <div
-              className="flex items-center justify-center animate-fade-in"
+              className="mt-12 max-w-3xl mx-auto text-left animate-fade-in"
               style={{ animationDelay: "0.3s" }}
             >
-              <Button
-                variant="hero"
-                size="xl"
-                onClick={() => navigate("/intake")}
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-4 text-foreground">
+                What is AI Automation:
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                AI automation is a smarter way to run your business. It uses intelligent software to handle repetitive tasks like data entry, customer follow-ups, scheduling, and reporting automatically and accurately. It works quietly in the background, helping your business operate faster, smoother, and more efficiently.
+              </p>
+              <p className="text-muted-foreground mb-4">
+                For small business owners, AI automation means less time spent on manual work and more time focusing on customers, growth, and revenue.
+              </p>
+              <p className="text-muted-foreground mb-8">
+                For enterprise and corporate teams, it means scalable operations, consistent processes, better data visibility, and reduced operational costs without increasing workload.
+              </p>
+
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-4 text-foreground">
+                The Business Value:
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                AI automation reduces errors, speeds up operations, improves customer experience, and helps businesses grow without adding unnecessary overhead. The result is a more streamlined, high-performing organization built for long-term success.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                AI automation isn't just about saving time, it's about transforming how your business operates. By reducing manual work, your team can focus on what truly drives growth, that is, customers, strategy, and revenue.
+              </p>
+              <p className="text-muted-foreground mb-4">
+                With the right automation in place, businesses can:
+              </p>
+              <ul className="list-disc list-inside text-muted-foreground mb-8 space-y-2 pl-2">
+                <li>Reduce operational costs</li>
+                <li>Eliminate human errors</li>
+                <li>Respond to customers faster</li>
+                <li>Scale operations without hiring more staff</li>
+                <li>Gain real-time insights for smarter decisions</li>
+              </ul>
+
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-4 text-foreground">
+                The Real Business Impact
+              </h2>
+              <p className="text-muted-foreground">
+                When processes are automated, work gets done faster, customers get better service, and teams feel less overwhelmed. The result is a more productive business, happier customers, and measurable ROI often within the first few months.
+              </p>
             </div>
 
             {/* Video Section */}
