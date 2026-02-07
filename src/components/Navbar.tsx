@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { BookDemoModal } from "./BookDemoModal";
 import SmartRunAILogo from "@/assets/SmartRunAI_new_logo.png";
 
@@ -19,6 +19,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBookDemoOpen, setIsBookDemoOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,8 +59,16 @@ export const Navbar = () => {
             ))}
           </div>
 
-          {/* Book Demo Button */}
-          <div className="hidden md:block">
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <Button
+              variant="hero"
+              size="default"
+              onClick={() => navigate("/intake")}
+            >
+              Get Started
+              <ArrowRight className="w-4 h-4" />
+            </Button>
             <Button
               variant="hero"
               size="default"
