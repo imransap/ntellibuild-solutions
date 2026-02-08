@@ -298,11 +298,84 @@ const handler = async (req: Request): Promise<Response> => {
     if (!res.ok) {
       const errorData = await res.text();
       console.error("Resend API error:", errorData);
-      throw new Error(`Failed to send email: ${errorData}`);
+      throw new Error(`Failed to send internal email: ${errorData}`);
     }
 
     const emailResponse = await res.json();
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Internal notification email sent successfully:", emailResponse);
+
+    // --- Send confirmation email to the user ---
+    let confirmSubject: string;
+    let confirmHtml: string;
+
+    const formLabel = formType === "demo"
+      ? "demo request"
+      : formType === "intake"
+        ? "project intake submission"
+        : "message";
+
+    confirmSubject = formType === "demo"
+      ? "Thanks for Your Demo Request — Smart Run AI"
+      : formType === "intake"
+        ? "Thanks for Your Intake Submission — Smart Run AI"
+        : "Thanks for Reaching Out — Smart Run AI";
+
+    confirmHtml = `
+      <div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto; color: #222;">
+        <h1 style="color: #1a1a2e; font-size: 22px;">Thank You, ${safeFirstName}!</h1>
+        <p>We've received your ${formLabel} and appreciate you reaching out to Smart Run AI.</p>
+        
+        <h2 style="font-size: 18px; color: #1a1a2e; margin-top: 24px;">What Happens Next?</h2>
+        <ul style="line-height: 1.8;">
+          <li>Our team will review your ${formLabel} carefully.</li>
+          <li>A member of our team will reach out to you as soon as possible — typically within <strong>1–2 business days</strong>.</li>
+          ${formType === "demo" ? "<li>We'll coordinate a convenient time to walk you through a personalized demo.</li>" : ""}
+          ${formType === "intake" ? "<li>We'll assess your project details and prepare tailored recommendations for your review.</li>" : ""}
+        </ul>
+
+        <p>In the meantime, feel free to reply to this email if you have any additional questions or details to share.</p>
+
+        <p style="margin-top: 28px;">We look forward to connecting with you!</p>
+
+        <p style="margin-top: 8px;">
+          Thank You,<br/>
+          <strong>Team Smart Run AI</strong>
+        </p>
+
+        <hr style="margin-top: 32px; border: none; border-top: 1px solid #ddd;" />
+        <p style="font-size: 12px; color: #888;">
+          Smart Run AI · Toronto, Ontario, CA<br/>
+          <a href="https://smartrunai.com" style="color: #888;">smartrunai.com</a>
+        </p>
+      </div>
+    `;
+
+    try {
+      const confirmRes = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "Smart Run AI <info@smartrunai.com>",
+          to: [email],
+          subject: confirmSubject,
+          html: confirmHtml,
+          reply_to: "info@smartrunai.com",
+        }),
+      });
+
+      if (!confirmRes.ok) {
+        const confirmError = await confirmRes.text();
+        console.error("Confirmation email error (non-blocking):", confirmError);
+      } else {
+        const confirmData = await confirmRes.json();
+        console.log("Confirmation email sent to user:", confirmData);
+      }
+    } catch (confirmErr) {
+      console.error("Failed to send confirmation email (non-blocking):", confirmErr);
+    }
 
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,
