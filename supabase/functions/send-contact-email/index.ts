@@ -309,10 +309,10 @@ const handler = async (req: Request): Promise<Response> => {
     let confirmHtml: string;
 
     const formLabel = formType === "demo"
-      ? "demo request"
+      ? "Demo Request"
       : formType === "intake"
-        ? "project intake submission"
-        : "message";
+        ? "Intake Submission"
+        : "Inquiry";
 
     confirmSubject = formType === "demo"
       ? "Thanks for Your Demo Request — Smart Run AI"
@@ -320,26 +320,20 @@ const handler = async (req: Request): Promise<Response> => {
         ? "Thanks for Your Intake Submission — Smart Run AI"
         : "Thanks for Reaching Out — Smart Run AI";
 
+    const displayName = safeLastName ? `${safeFirstName} ${safeLastName}` : safeFirstName;
+
     confirmHtml = `
       <div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto; color: #222;">
-        <h1 style="color: #1a1a2e; font-size: 22px;">Thank You, ${safeFirstName}!</h1>
-        <p>We've received your ${formLabel} and appreciate you reaching out to Smart Run AI.</p>
-        
-        <h2 style="font-size: 18px; color: #1a1a2e; margin-top: 24px;">What Happens Next?</h2>
-        <ul style="line-height: 1.8;">
-          <li>Our team will review your ${formLabel} carefully.</li>
-          <li>A member of our team will reach out to you as soon as possible — typically within <strong>1–2 business days</strong>.</li>
-          ${formType === "demo" ? "<li>We'll coordinate a convenient time to walk you through a personalized demo.</li>" : ""}
-          ${formType === "intake" ? "<li>We'll assess your project details and prepare tailored recommendations for your review.</li>" : ""}
-        </ul>
+        <p style="font-size: 16px;">Hi ${displayName},</p>
 
-        <p>In the meantime, feel free to reply to this email if you have any additional questions or details to share.</p>
+        <p>Thank you for taking the time to submit your information and contact Smart Run AI. We have successfully received your details and will now review to determine the most appropriate next steps. A member of our team will be in touch within the next 1–2 business days.</p>
 
-        <p style="margin-top: 28px;">We look forward to connecting with you!</p>
+        <p>We appreciate your interest and look forward to connecting with you.</p>
 
-        <p style="margin-top: 8px;">
-          Thank You,<br/>
-          <strong>Team Smart Run AI</strong>
+        <p style="margin-top: 28px;">
+          Best regards,<br/>
+          <strong>Smart Run AI Team</strong><br/>
+          <a href="mailto:info@smartrunai.com" style="color: #1a1a2e;">info@smartrunai.com</a>
         </p>
 
         <hr style="margin-top: 32px; border: none; border-top: 1px solid #ddd;" />
