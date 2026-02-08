@@ -84,21 +84,50 @@ const About = () => {
                 Our Story
               </h2>
               <div className="space-y-4 text-muted-foreground">
-                <p>
-                  Founded with a vision to bridge the gap between cutting-edge AI technology 
-                  and practical business applications, SmartRunAI has grown into a trusted 
-                  partner for organizations seeking digital transformation.
+                <p className="font-semibold text-foreground italic">
+                  It started with a problem I couldn't ignore.
                 </p>
                 <p>
-                  We understand that every business is unique. That's why we don't believe 
-                  in one-size-fits-all solutions. Our team of AI specialists works closely 
-                  with each client to develop customized automation strategies that align 
-                  with their specific goals and challenges.
+                  I watched small businesses around me drowning in repetitive tasks — business owners spending weekends updating spreadsheets, sales teams buried in data entry, customer service reps copying and pasting the same responses hundreds of times. They knew AI could help. They just didn't know where to start.
                 </p>
                 <p>
-                  From automating lead generation to streamlining customer communications, 
-                  we've helped countless businesses save time, reduce costs, and focus on 
-                  what matters most—their customers.
+                  Most agencies wanted to sell them the most expensive solution. I wanted to build them the right one.
+                </p>
+                <p>
+                  Late nights turned into early mornings as I channeled two decades of experience in SAP analytics, solution architecture, and client consulting into a new mission. I'd spent years understanding how businesses work — gathering requirements, diagnosing pain points in boardrooms and on factory floors. Now I was bringing all of that knowledge to solve a different kind of problem: helping businesses harness AI and automation in ways that actually worked for them.
+                </p>
+                <p>
+                  Our first client was a small medical clinic drowning in appointment chaos. Their front desk staff was spending hours every day juggling phone calls — scheduling, rescheduling, canceling, confirming. Patients on hold. Missed appointments creating gaps in the schedule. The team was exhausted, and the clinic was losing revenue from unfilled slots.
+                </p>
+                <p>
+                  We built them an intelligent system that handled it all automatically. Patients could book online instantly. Cancellations triggered smart rebooking from the waitlist. Reminders went out seamlessly. When the office manager called to tell us her staff actually took a lunch break on time for the first time in months — and that they'd filled 90% of their previously lost appointments — I knew we were onto something.
+                </p>
+                <p className="font-semibold text-foreground">
+                  That's become our measuring stick. Not features. Not complexity. Impact.
+                </p>
+                <p>
+                  We don't do cookie‑cutter solutions because no two businesses hurt in the same way. A system that transforms one company might be useless to another. So we listen first. We ask the uncomfortable questions. We dig until we understand not just what's broken, but why it matters.
+                </p>
+                <p>
+                  And when budget is tight, we get creative. We've built phased solutions, started with quick wins, and yes — occasionally worked for less because we believed in what someone was building. This isn't charity. It's partnership. When our clients grow, we grow.
+                </p>
+                <p className="font-semibold text-foreground">
+                  Some agencies want to impress you with jargon. We want to impress you with results.
+                </p>
+                <p>
+                  Every automation we build, every workflow we optimize, every hour we give back to a business owner — it's not just about efficiency. It's about giving people their lives back. It's about helping small teams compete with big companies. It's about turning "impossible" into "done."
+                </p>
+                <p>
+                  We're not the biggest agency. We're not the flashiest. But when you work with us, you're not getting a vendor. You're getting a team that genuinely cares whether you succeed — and will do whatever it takes to make sure you do.
+                </p>
+                <p className="font-semibold text-foreground italic">
+                  That's not our business model. That's our promise.
+                </p>
+                <p className="mt-6 text-foreground">
+                  P.S. If our story resonates with your struggle, let's talk. I'd love to hear yours.
+                </p>
+                <p className="font-semibold text-foreground mt-2">
+                  — Founder &amp; CEO
                 </p>
               </div>
             </div>
