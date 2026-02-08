@@ -64,6 +64,7 @@ export const Navbar = () => {
             <Button
               variant="hero"
               size="default"
+              className="min-w-[130px]"
               onClick={() => navigate("/intake")}
             >
               Get Started
@@ -71,6 +72,7 @@ export const Navbar = () => {
             <Button
               variant="hero"
               size="default"
+              className="min-w-[130px]"
               onClick={() => setIsBookDemoOpen(true)}
             >
               Book a Demo
