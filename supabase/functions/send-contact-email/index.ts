@@ -287,7 +287,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "SmartRunAI <onboarding@resend.dev>",
+        from: "SmartRunAI <noreply@smartrunai.com>",
         to: ["info@smartrunai.com"],
         subject: subject,
         html: htmlContent,
