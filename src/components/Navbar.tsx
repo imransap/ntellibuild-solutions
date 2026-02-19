@@ -109,6 +109,16 @@ export const Navbar = () => {
               variant="hero"
               className="w-full mt-4"
               onClick={() => {
+                navigate("/intake");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Get Started
+            </Button>
+            <Button
+              variant="hero"
+              className="w-full mt-2"
+              onClick={() => {
                 setIsBookDemoOpen(true);
                 setIsMobileMenuOpen(false);
               }}
