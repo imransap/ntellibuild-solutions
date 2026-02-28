@@ -29,7 +29,7 @@ const footerLinks = {
 
 const socialLinks = [
   { icon: Linkedin, href: "https://www.linkedin.com/company/smart-run-ai/", label: "LinkedIn" },
-  { icon: Instagram, href: "https://www.instagram.com/smartrunai/", label: "Instagram" },
+  { icon: Instagram, href: "https://www.instagram.com/smartrun.ai/", label: "Instagram" },
   { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61585859322605", label: "Facebook" },
 ];
 
